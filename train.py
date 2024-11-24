@@ -1,4 +1,5 @@
 import csv
+import numpy as np
 
 def is_number(value):
 	try:
@@ -17,11 +18,21 @@ def load_data(file):
 				datas.append([float(value) for value in row.values()])
 			else:
 				print(f"This row will not be used: ", row)
-	print(datas)
+	if not datas:
+		raise ValueError("There is no usable data in your file.")
+	return datas
+
+def process_data(datas):
+	datas = np.array(datas) # to pass from list of lists to array
+	x = datas[:, 0]
+	y = datas[:, 1]
+	m = len(x) # m is the number of elements
+	
 
 def main():
 	try:
-		load_data('data.csv')
+		datas = load_data('data.csv')
+		process_data(datas)
 	except ValueError as e:
 		print(f"Error : ", e)
 		return

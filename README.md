@@ -1,5 +1,3 @@
-from ansible_collections.cisco.nxos.plugins.module_utils.network.nxos.config.acl_interfaces.acl_interfaces import Acl_interfaces
-
 # ft_linear_regression
 The aim of this project is to introduce us to the basic concept behind machine learning. For this project, we will have to create a program that predicts the price of a car by using a linear function train with a gradient descent algorithm.
 
@@ -10,7 +8,7 @@ First, we get the data form the csv file, that we store in a list of lists
 ## 2. The model
 
 The linear regression is used to find a linear relationship between a dependant variable (here the mileage of the car) and an independent variable (the price of the car). Since it gives us a line, it will be defined as:
-	f(x) = a.x + b
+	***f(x) = a.x + b***
 
 ### The cost function (Mean Squared Error)
 
@@ -33,21 +31,26 @@ We will use a random starting point, and we will update the value of 'a' by adva
 
 So to avoid multiple calculations, we can use matrix multiplication, which will apply a formula to all the samples at once. This will allow us to calculate the cost function and the gradient descent algorithm much faster.
 
+To apply to all elements **(i)**, we can represent the model as follow:
+
+![alt text](./images/ax+b_as_matrix.png)
+
+
 Our model is now defined as:
-	f(X) = X . Theta
+	***f(X) = X . Theta***
 
-Where X is a matrix of the samples, and Theta is a matrix of the parameters 'a' and 'b'. These represent the 'ax + b' part of the cost function.
-
-
-
-
+Where **X** is a matrix of the samples (m x 2), and **Theta** is a matrix of the parameters 'a' and 'b' (2 x 1). So our X.Theta is now a matrix of **(m x 1)**.
 
 Reminder about a matrix multiplication:
 
 ![alt text](./images/matrix_multiplication.png)
 
+Now, to replace the *'-y^(i)'* of our model with a matrix, and since X.Theta is (m x 1), we put all the values in an array, which also gives a matrix of (m x 1).
+
+So now our model is like this:
 
 ![alt text](./images/cost_function_matrix.png)
+
 
 
 ## Numpy on matrix

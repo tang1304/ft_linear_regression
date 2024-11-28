@@ -27,14 +27,29 @@ def process_data(datas):
 	x = datas[:, 0]
 	y = datas[:, 1]
 	m = len(x) # m is the number of elements
+
+	x_std = np.std(x)
+	y_std = np.std(y)
+	x_mean = np.mean(x)
+	y_mean = np.mean(y)
+
+	if (x_std != 0 and y_std != 0):
+		x_norm = (x - x_mean)/x_std
+		y_norm = (y - y_mean)/y_std
+	else:
+		raise ZeroDivisionError()
 	
+
+
+
+
 
 def main():
 	try:
 		datas = load_data('data.csv')
 		process_data(datas)
-	except ValueError as e:
-		print(f"Error : ", e)
+	except :
+		print(f"Error : ")
 		return
 	
 if __name__ == "__main__":

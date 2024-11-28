@@ -51,7 +51,15 @@ So now our model is like this:
 
 ![alt text](./images/cost_function_matrix.png)
 
+## Normalizing the data
 
+In machine learning, normalizing the datas is ranging multple datasets on a same scale (between 0 and 1 mostly), so the datasets have the same weight.
+Here, our price and mileage datas are quite similar (thousands to hundred thousands), but it can be way worse (0,00001 compared to 10000000 for example).
+With linear regression application, normalizing datas is not important, but it is when using gradient descent algorithm, it accelerates the finding of the minimal error.
+
+![alt text](./images/standardization_formula.png)
+
+With **X** the array of values, **μ** the mean of the array, and **σ** the standard deviation (ecart type).
 
 ## Numpy on matrix
 

@@ -42,7 +42,7 @@ $$a_{i+1} = a_i - \alpha \frac{\partial J}{\partial a}$$
 
 So to avoid multiple calculations, we can use matrix multiplication, which will apply a formula to all the samples at once. This will allow us to calculate the cost function and the gradient descent algorithm much faster.
 
-To apply to all elements **(i)**, we can represent the model as follow:
+To apply to all elements **(i)**, we can represent the model as follows:
 
 ![alt text](./images/ax+b_as_matrix.png)
 
@@ -72,7 +72,7 @@ That formula will calculate all the derived of $J$ for each $\theta$.
  
 ## Normalizing the data
 
-In machine learning, normalizing the datas is ranging multple datasets on a same scale (between 0 and 1 mostly), so the datasets have the same weight.
+In machine learning, normalizing the datas is ranging multiple datasets on a same scale (between 0 and 1 mostly), so the datasets have the same weight.
 Here, our price and mileage datas are quite similar (thousands to hundred thousands), but it can be way worse (0,00001 compared to 10000000 for example).
 With linear regression application, normalizing datas is not important, but it is when using gradient descent algorithm, it accelerates the finding of the minimal error.
 

@@ -112,3 +112,5 @@ https://numpy.org/doc/stable/reference/index.html
 https://matplotlib.org/stable/users/index
 
 https://dilipkumar.medium.com/linear-regression-model-using-gradient-descent-algorithm-50267f55c4ac
+
+https://www.educative.io/answers/a-deep-dive-into-linear-regression-3-way-implementation

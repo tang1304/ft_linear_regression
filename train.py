@@ -1,4 +1,5 @@
 import csv
+import json
 import numpy as np
 import matplotlib.pyplot as plt
 from pandas import DataFrame
@@ -27,6 +28,13 @@ def load_data(file):
 	return datas
 
 
+def unstandardize(x, y, theta):
+	t0 = (y.std() / x.std()) * theta[0][0]
+	t1 = y.std() * theta[1][0] - (y.std() * theta[0][0] * x.mean() / x.std()) + y.mean()
+
+	return t0, t1
+
+
 def model_matrix(x, theta):
 	return np.dot(x, theta)
 
@@ -36,8 +44,6 @@ def cost_function(x, y, theta, m):
 
 
 def gradients(x, y, theta, m):
-	# print(f"X: {x}, shape: {x.shape}")
-	# print(f"Y: {y}, shape: {y.shape}")
 	return 1/m * x.T.dot(model_matrix(x, theta) - y)
 
 
@@ -49,9 +55,6 @@ def gradient_descent_algo(x, y, theta, m, learning_rate, n):
 		cost = cost_function(x, y, theta, m)
 		costs.append(cost)
 
-		if i % 100 == 0:
-			print(f"Iteration {i} : cost = {cost}")
-			print(f"theta = {theta}")
 	return theta, costs
 
 
@@ -60,6 +63,16 @@ def plotting_first(x_val, y_val):
 	plt.xlabel("Mileage (km)")
 	plt.ylabel("Price (€)")
 	plt.title("Scatter plot of cars prices according to their mileage")
+	plt.show()
+
+
+def plotting_lg(x_val, y_val, t0, t1):
+	lg = t0 * x_val + t1
+	plt.scatter(x_val, y_val)
+	plt.plot(x_val, lg, color='red')
+	plt.xlabel("Mileage (km)")
+	plt.ylabel("Price (€)")
+	plt.title("Scatter plot of cars prices according to their mileage, with the linear regression")
 	plt.show()
 
 
@@ -76,28 +89,31 @@ def process_data(datas):
 	y_mean = np.mean(y)
 
 	if x_std != 0 and y_std != 0:
-		x_norm = (x - x_mean)/x_std
-		y_norm = (y - y_mean)/y_std
+		x_stand = (x - x_mean)/x_std
+		y_stand = (y - y_mean)/y_std
 	else:
 		raise ZeroDivisionError()
-	print(f"Normalized x: {x_norm}")
-	print(f"Normalized y: {y_norm}")
+	print(f"Normalized x: {x_stand}")
+	print(f"Normalized y: {y_stand}")
 	ones_column = np.ones((m, 1))
-	x_norm = np.reshape(x_norm, (m, 1))
-	y_norm = np.reshape(y_norm, (m, 1))
-	X = np.hstack((x_norm, ones_column)) # X is the matrix of features
-	Y = np.hstack((y_norm, 1)) # Y is the matrix of labels
+	x_stand = np.reshape(x_stand, (m, 1))
+	Y = np.reshape(y_stand, (m, 1))
+	X = np.hstack((x_stand, ones_column)) # X is the matrix of features
 	theta = np.zeros((2, 1)) # theta is the matrix of the thetas (0 at the beginning)
-	print(f"X: {X}")
-	return X, y_norm, theta, m
+	return x, y, X, Y, theta, m
 
 
 def main():
 	try:
 		datas = load_data('data.csv')
-		X, Y, theta, m = process_data(datas)
-		theta, costs = gradient_descent_algo(X, Y, theta, m, 0.01, 2000)
+		x, y, X, Y, theta, m = process_data(datas)
+		thetas, costs = gradient_descent_algo(X, Y, theta, m, 0.01, 2000)
+		t0, t1 = unstandardize(x, y, thetas)
+		# plotting_lg(x, y, t0, t1)
+		print(f"theta0 = {t0}, theta1 = {t1}")
 
+		with open("train_data.json", "w") as file:
+			json.dump({"theta0": t0, "theta1": t1}, file)
 
 	except Exception as e:
 		print(f"Error : {e}")

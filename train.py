@@ -2,8 +2,7 @@ import csv
 import json
 import numpy as np
 import matplotlib.pyplot as plt
-from pandas import DataFrame
-import pandas as pd
+
 
 def is_number(value):
 	try:
@@ -107,9 +106,9 @@ def main():
 	try:
 		datas = load_data('data.csv')
 		x, y, X, Y, theta, m = process_data(datas)
-		thetas, costs = gradient_descent_algo(X, Y, theta, m, 0.01, 2000)
+		thetas, costs = gradient_descent_algo(X, Y, theta, m, 0.001, 2000)
 		t0, t1 = unstandardize(x, y, thetas)
-		# plotting_lg(x, y, t0, t1)
+		plotting_lg(x, y, t0, t1)
 		print(f"theta0 = {t0}, theta1 = {t1}")
 
 		with open("train_data.json", "w") as file:

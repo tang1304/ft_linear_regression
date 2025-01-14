@@ -1,5 +1,6 @@
 import csv
 import json
+import sys
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -61,7 +62,11 @@ def plotting_first(x_val, y_val):
 	plt.scatter(x_val, y_val)
 	plt.xlabel("Mileage (km)")
 	plt.ylabel("Price (€)")
-	plt.title("Scatter plot of cars prices according to their mileage")
+	if sys.argv[1] == "data.csv":
+		vehicle = "cars"
+	else:
+		vehicle = "cb500f motorbikes"
+	plt.title(f"Scatter plot of {vehicle} prices according to their mileage")
 	plt.show()
 
 
@@ -71,7 +76,11 @@ def plotting_lg(x_val, y_val, t0, t1):
 	plt.plot(x_val, lg, color='red')
 	plt.xlabel("Mileage (km)")
 	plt.ylabel("Price (€)")
-	plt.title("Scatter plot of cars prices according to their mileage, with the linear regression")
+	if sys.argv[1] == "data.csv":
+		vehicle = "cars"
+	else:
+		vehicle = "cb500f motorbikes"
+	plt.title(f"Scatter plot of {vehicle} prices according to their mileage, with the linear regression")
 	plt.show()
 
 
@@ -79,7 +88,7 @@ def process_data(datas):
 	datas = np.array(datas) # to pass from list of lists to array
 	x = datas[:, 0]
 	y = datas[:, 1]
-	# plotting_first(x, y)
+	plotting_first(x, y)
 	m = len(x) # m is the number of elements
 
 	x_std = np.std(x)
@@ -92,8 +101,6 @@ def process_data(datas):
 		y_stand = (y - y_mean)/y_std
 	else:
 		raise ZeroDivisionError()
-	print(f"Normalized x: {x_stand}")
-	print(f"Normalized y: {y_stand}")
 	ones_column = np.ones((m, 1))
 	x_stand = np.reshape(x_stand, (m, 1))
 	Y = np.reshape(y_stand, (m, 1))
@@ -104,12 +111,14 @@ def process_data(datas):
 
 def main():
 	try:
-		datas = load_data('data.csv')
+		assert len(sys.argv) == 2, "You must enter a correct dataset filename."
+		datas = load_data(sys.argv[1])
 		x, y, X, Y, theta, m = process_data(datas)
-		thetas, costs = gradient_descent_algo(X, Y, theta, m, 0.001, 2000)
+		thetas, costs = gradient_descent_algo(X, Y, theta, m, 0.01, 2000)
 		t0, t1 = unstandardize(x, y, thetas)
 		plotting_lg(x, y, t0, t1)
 		print(f"theta0 = {t0}, theta1 = {t1}")
+		print("The model has been trained and thetas have been saved in train_data.json")
 
 		with open("train_data.json", "w") as file:
 			json.dump({"theta0": t0, "theta1": t1}, file)

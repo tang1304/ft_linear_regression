@@ -2,6 +2,7 @@ from train import load_data
 import numpy as np
 import json
 import os
+import sys
 
 
 def predict(t0, t1, mileages):
@@ -16,14 +17,13 @@ def calculate_mse(real_prices, predicted_prices, m) -> float:
 
 def main():
 	try:
-		datas = load_data('data.csv')
-		if os.path.exists("train_data.json"):
-			with open("train_data.json", "r") as file:
-				train_data = json.load(file)
-				theta0 = train_data["theta0"]
-				theta1 = train_data["theta1"]
-		else:
-			raise FileNotFoundError("Error: train_data.json not found")
+		assert len(sys.argv) == 2, "You must enter a correct dataset filename."
+		datas = load_data(sys.argv[1])
+		assert os.path.exists("train_data.json"), "Error: train_data.json not found"
+		with open("train_data.json", "r") as file:
+			train_data = json.load(file)
+			theta0 = train_data["theta0"]
+			theta1 = train_data["theta1"]
 		datas = np.array(datas)
 		mileages = datas[:, 0]
 		real_prices = datas[:, 1]

@@ -5,9 +5,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def is_number(value):
+def is_positive_number(value):
 	try:
-		float(value)
+		nbr = float(value)
+		if nbr < 0:
+			raise ValueError(f"{nbr} is not a positive number.")
 		return True
 	except ValueError as e:
 		print(f"Error : ", e)
@@ -19,7 +21,7 @@ def load_data(file):
 	with open(file, 'r') as csv_file: # 'with' closes automatically the file at the end
 		reader = csv.DictReader(csv_file, delimiter=',') # dictReader uses the first row as keys for the dict
 		for row in reader:
-			if all(is_number(value) for value in row.values()):
+			if all(is_positive_number(value) for value in row.values()):
 				datas.append([float(value) for value in row.values()])
 			else:
 				print(f"This row will not be used: ", row)
@@ -31,7 +33,6 @@ def load_data(file):
 def unstandardize(x, y, theta):
 	t0 = (y.std() / x.std()) * theta[0][0]
 	t1 = y.std() * theta[1][0] - (y.std() * theta[0][0] * x.mean() / x.std()) + y.mean()
-
 	return t0, t1
 
 
@@ -50,11 +51,19 @@ def gradients(x, y, theta, m):
 def gradient_descent_algo(x, y, theta, m, learning_rate, n):
 	costs = []
 	for i in range(n):
+
 		grad = gradients(x, y, theta, m)
 		theta -= learning_rate * grad
 		cost = cost_function(x, y, theta, m)
 		costs.append(cost)
-
+		if i % 100 == 0:
+			print(f"Iteration {i} : cost = {cost}")
+	plt.plot(costs)
+	plt.xlabel("Number of iterations")
+	plt.ylabel("Cost")
+	plt.title("Linear regression cost")
+	plt.savefig("Cost.png")
+	plt.clf()
 	return theta, costs
 
 
@@ -67,7 +76,8 @@ def plotting_first(x_val, y_val):
 	else:
 		vehicle = "cb500f motorbikes"
 	plt.title(f"Scatter plot of {vehicle} prices according to their mileage")
-	plt.show()
+	plt.savefig("Scatter_datas.png")
+	plt.clf()
 
 
 def plotting_lg(x_val, y_val, t0, t1):
@@ -81,7 +91,8 @@ def plotting_lg(x_val, y_val, t0, t1):
 	else:
 		vehicle = "cb500f motorbikes"
 	plt.title(f"Scatter plot of {vehicle} prices according to their mileage, with the linear regression")
-	plt.show()
+	plt.savefig("Scatter_with_lr.png")
+	plt.clf()
 
 
 def process_data(datas):
@@ -114,7 +125,7 @@ def main():
 		assert len(sys.argv) == 2, "You must enter a correct dataset filename."
 		datas = load_data(sys.argv[1])
 		x, y, X, Y, theta, m = process_data(datas)
-		thetas, costs = gradient_descent_algo(X, Y, theta, m, 0.01, 2000)
+		thetas, costs = gradient_descent_algo(X, Y, theta, m, 0.01, 500)
 		t0, t1 = unstandardize(x, y, thetas)
 		plotting_lg(x, y, t0, t1)
 		print(f"theta0 = {t0}, theta1 = {t1}")

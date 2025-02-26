@@ -16,7 +16,7 @@ def main():
             theta0 = 0
             theta1 = 0
         mileage = int(sys.argv[1])
-        price = (theta0 * mileage) + theta1
+        price = (theta1 * mileage) + theta0
         if price < 0:
             price = 0
         print(f"The estimated price for a car with {mileage} km is {price:.0f} €.")

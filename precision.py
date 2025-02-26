@@ -6,7 +6,7 @@ import sys
 
 
 def predict(t0, t1, mileages):
-	return [int((t0 * mileage) +t1) for mileage in mileages]
+	return [int((t1 * mileage) + t0) for mileage in mileages]
 
 
 def calculate_mse(real_prices, predicted_prices, m) -> float:

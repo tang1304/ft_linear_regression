@@ -31,10 +31,8 @@ def load_data(file):
 
 
 def unstandardize(x, y, t0, t1):
-	# t0 = (y.std() / x.std()) * t0
-	# t1 = y.std() * t1 - (y.std() * t0 * x.mean() / x.std()) + y.mean()
-	t1 = t1 / x.std()
-	t0 = t0 - (t1 * x.mean())
+	t1 = t1 * y.std() / x.std()
+	t0 = y.mean() - (t1 * x.mean())
 	return t0, t1
 
 
@@ -51,7 +49,7 @@ def gradient_descent_algo(x, y, m, learning_rate, n):
 	t0 = 0
 	t1 = 0
 	for i in range(n):
-		estimate_price = np.dot(x, t1) + t0
+		estimate_price = t0 + np.dot(x, t1)
 		w_derived = (1/m) * np.dot(x, (estimate_price - y))
 		b_derived = (1/m) * np.sum(estimate_price - y)
 		cost = cost_function(y, estimate_price, m)
@@ -105,24 +103,24 @@ def process_data(datas):
 	m = len(x) # m is the number of elements
 
 	x_std = np.std(x)
-	# y_std = np.std(y)
+	y_std = np.std(y)
 	x_mean = np.mean(x)
-	# y_mean = np.mean(y)
+	y_mean = np.mean(y)
 
 	if x_std != 0 :
 		x_stand = (x - x_mean)/x_std
+		y_stand = (y - y_mean)/y_std
 	else:
 		raise ZeroDivisionError()
-
-	return x, y, x_stand, m
+	return x, y, x_stand, y_stand, m
 
 
 def main():
 	try:
 		assert len(sys.argv) == 2, "You must enter a correct dataset filename."
 		datas = load_data(sys.argv[1])
-		x, y, X, m = process_data(datas)
-		t0, t1, costs = gradient_descent_algo(X, y, m, 0.01, 500)
+		x, y, X, Y, m = process_data(datas)
+		t0, t1, costs = gradient_descent_algo(X, Y, m, 0.01, 1000)
 		t0, t1 = unstandardize(x, y, t0, t1)
 		plotting_lr(x, y, t0, t1)
 		print(f"theta0 = {t0}, theta1 = {t1}")

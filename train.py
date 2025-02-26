@@ -30,41 +30,43 @@ def load_data(file):
 	return datas
 
 
-def unstandardize(x, y, theta):
-	t0 = (y.std() / x.std()) * theta[0][0]
-	t1 = y.std() * theta[1][0] - (y.std() * theta[0][0] * x.mean() / x.std()) + y.mean()
+def unstandardize(x, y, t0, t1):
+	# t0 = (y.std() / x.std()) * t0
+	# t1 = y.std() * t1 - (y.std() * t0 * x.mean() / x.std()) + y.mean()
+	t1 = t1 / x.std()
+	t0 = t0 - (t1 * x.mean())
 	return t0, t1
 
 
-def model_matrix(x, theta):
-	return np.dot(x, theta)
-
-
-def cost_function(x, y, theta, m):
-	return 1/(2*m) * np.sum((model_matrix(x, theta) - y)**2)
+def cost_function(y, estimate_price, m):
+	return (1 / (2 * m)) * np.sum((estimate_price - y)**2)
 
 
 def gradients(x, y, theta, m):
-	return 1/m * x.T.dot(model_matrix(x, theta) - y)
+	return 1/m * x.T.dot(np.dot(x, theta) - y)
 
 
-def gradient_descent_algo(x, y, theta, m, learning_rate, n):
+def gradient_descent_algo(x, y, m, learning_rate, n):
 	costs = []
+	t0 = 0
+	t1 = 0
 	for i in range(n):
-
-		grad = gradients(x, y, theta, m)
-		theta -= learning_rate * grad
-		cost = cost_function(x, y, theta, m)
+		estimate_price = np.dot(x, t1) + t0
+		w_derived = (1/m) * np.dot(x, (estimate_price - y))
+		b_derived = (1/m) * np.sum(estimate_price - y)
+		cost = cost_function(y, estimate_price, m)
 		costs.append(cost)
+		t0 -= learning_rate * b_derived
+		t1 -= learning_rate * w_derived
 		if i % 100 == 0:
-			print(f"Iteration {i} : cost = {cost}")
+			print(f"Iteration {i} : cost = {cost} ; theta0 = {t0} ; theta1 = {t1}")
 	plt.plot(costs)
 	plt.xlabel("Number of iterations")
 	plt.ylabel("Cost")
 	plt.title("Linear regression cost")
 	plt.savefig("Cost.png")
 	plt.clf()
-	return theta, costs
+	return t0, t1, costs
 
 
 def plotting_first(x_val, y_val):
@@ -80,10 +82,10 @@ def plotting_first(x_val, y_val):
 	plt.clf()
 
 
-def plotting_lg(x_val, y_val, t0, t1):
-	lg = t0 * x_val + t1
+def plotting_lr(x_val, y_val, t0, t1):
+	lr = t0 + t1 * x_val
 	plt.scatter(x_val, y_val)
-	plt.plot(x_val, lg, color='red')
+	plt.plot(x_val, lr, color='red')
 	plt.xlabel("Mileage (km)")
 	plt.ylabel("Price (€)")
 	if sys.argv[1] == "data.csv":
@@ -103,31 +105,26 @@ def process_data(datas):
 	m = len(x) # m is the number of elements
 
 	x_std = np.std(x)
-	y_std = np.std(y)
+	# y_std = np.std(y)
 	x_mean = np.mean(x)
-	y_mean = np.mean(y)
+	# y_mean = np.mean(y)
 
-	if x_std != 0 and y_std != 0:
+	if x_std != 0 :
 		x_stand = (x - x_mean)/x_std
-		y_stand = (y - y_mean)/y_std
 	else:
 		raise ZeroDivisionError()
-	ones_column = np.ones((m, 1))
-	x_stand = np.reshape(x_stand, (m, 1))
-	Y = np.reshape(y_stand, (m, 1))
-	X = np.hstack((x_stand, ones_column)) # X is the matrix of features
-	theta = np.zeros((2, 1)) # theta is the matrix of the thetas (0 at the beginning)
-	return x, y, X, Y, theta, m
+
+	return x, y, x_stand, m
 
 
 def main():
 	try:
 		assert len(sys.argv) == 2, "You must enter a correct dataset filename."
 		datas = load_data(sys.argv[1])
-		x, y, X, Y, theta, m = process_data(datas)
-		thetas, costs = gradient_descent_algo(X, Y, theta, m, 0.01, 500)
-		t0, t1 = unstandardize(x, y, thetas)
-		plotting_lg(x, y, t0, t1)
+		x, y, X, m = process_data(datas)
+		t0, t1, costs = gradient_descent_algo(X, y, m, 0.01, 500)
+		t0, t1 = unstandardize(x, y, t0, t1)
+		plotting_lr(x, y, t0, t1)
 		print(f"theta0 = {t0}, theta1 = {t1}")
 		print("The model has been trained and thetas have been saved in train_data.json")
 
@@ -137,7 +134,6 @@ def main():
 	except Exception as e:
 		print(f"Error : {e}")
 		return
-
 
 if __name__ == "__main__":
 	main()

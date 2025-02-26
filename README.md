@@ -10,6 +10,8 @@ First, we get the data form the csv file, that we store in a list of lists
 The linear regression is used to find a linear relationship between a dependant variable (here the mileage of the car) and an independent variable (the price of the car). Since it gives us a line, it will be defined as:
 	$$f(x) = a.x + b$$
 
+Where $a$ is the slope of the line, called the `weight` w, and $b$ is the intercept of the line with the y-axis, called the `bias` b.
+
 ## The cost function (Mean Squared Error)
 
 $$ J(a, b) = 1/2m\sum_{i=1}^m(ax^{(i)}+b-y^{(i)})^2 $$
@@ -25,11 +27,11 @@ The gradient descent algorithm is used to find this minimum. It is based on the 
 
 ![alt text](./images/gradient_descent_on_mean_squared_error.png)
 
-This will be applied to $a$ and $b$, in our case, $\theta_0$ and $\theta_1$
+This will be applied to $a$ and $b$ (or w and b), in our case, $\theta_0$ and $\theta_1$
 
 Calculation of a gradient for $a$ and $b$:
 
-$$\frac{\partial J}{\partial a} = 1/m \sum_{i=1}^mx(ax^{(i)}+b - y^{(i)})$$
+$$\frac{\partial J}{\partial a} = 1/m \sum_{i=1}^m(ax^{(i)}+b - y^{(i)})*x$$
 
 $$\frac{\partial J}{\partial b} = 1/m \sum_{i=1}^m(ax^{(i)}+b - y^{(i)})$$
 
